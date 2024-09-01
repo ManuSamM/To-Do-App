@@ -9,12 +9,15 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const [newTask, setNewTask] = useState("");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [username, setUsername] = useState<string | null>(null);
   const { requireAuth } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     requireAuth();
-  });
+    const storedUsername = localStorage.getItem("username");
+    setUsername(storedUsername);
+  }, [requireAuth]);
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,12 +32,13 @@ export default function Home() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("username"); // Clear username on logout
     router.push("/login");
   };
 
   return (
     <div>
-      <h1>To-Do List</h1>
+      <h1>To-Do List {username && <>of {username}</>}</h1>
       <form onSubmit={handleCreateTask}>
         <input
           type="text"
